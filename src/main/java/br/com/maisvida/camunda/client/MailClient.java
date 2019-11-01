@@ -26,7 +26,7 @@ public class MailClient {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
 			messageHelper.setFrom("suporte.maisvida@gmail.com");
 			messageHelper.setTo(recipient);
-			messageHelper.setSubject("[Solicitação de Férias] - Reprovação :( ");
+			messageHelper.setSubject("[Solicitação de Férias] - Rejeição :( ");
 			String content = mailContentBuilder.build(message);
 			messageHelper.setText(content, true);
 		};
