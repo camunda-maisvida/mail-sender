@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -15,45 +14,52 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
+import br.com.maisvida.camunda.dto.EmailDTO;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MailClientTests {
+public class EmailClientTests {
 
 	@Autowired
-	private MailClient mailClient;
-	
-	@Resource
-	private JavaMailSender mailSender;
+	private SolicitacaoDeFeriasMailService solicitacaoDeFeriasMailService;
 
 	private GreenMail smtpServer;
 
 	@BeforeEach
-	public void setUp() throws Exception {
-		 //Test properties      
-		smtpServer = new GreenMail(ServerSetupTest.SMTP);      
-		 //GreenMail server startup using test configuration      
-		smtpServer.start();      
+	public void iniciar() throws Exception {
+
+		// Test properties
+		smtpServer = new GreenMail(ServerSetupTest.SMTP);
+		// GreenMail server startup using test configuration
+		smtpServer.start();
 	}
 
 	@Test
-	public void shouldSendMail() throws Exception {
+	public void test_deveEnviarEmail() throws Exception {
+
 		// given
-		String recipient = "rodolfo.maisvida@gmail.com";
-		String message = "Test message content";
+		final EmailDTO mailDTO = EmailDTO.EmailBuilder.newBuild()
+				.from("rodolfo.maisvida@gmail.com")
+				.to("rodolfocruz121@gmail.com")
+				.subject("Teste unitário")
+				.variable("message", "Testando conteúdo de mensagem")
+				.build();
+
 		// when
-		mailClient.prepareAndSend(recipient, message);
+		solicitacaoDeFeriasMailService.send(mailDTO);
+
 		// then
-		String content = "<span>" + message + "</span>";
+		final String content = mailDTO.getVariables().get("message").toString();
 		assertReceivedMessageContains(content);
 	}
 
 	private void assertReceivedMessageContains(String expected) throws IOException, MessagingException {
+
 		MimeMessage[] receivedMessages = smtpServer.getReceivedMessages();
 		assertEquals(1, receivedMessages.length);
 		String content = (String) receivedMessages[0].getContent();
@@ -61,7 +67,8 @@ public class MailClientTests {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	public void pararServidor() throws Exception {
+
 		smtpServer.stop();
 	}
 
