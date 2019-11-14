@@ -60,6 +60,8 @@ public class EmailClientTests {
 
 	private void assertReceivedMessageContains(String expected) throws IOException, MessagingException {
 
+		assertTrue(smtpServer.waitForIncomingEmail(5000, 1));
+		
 		MimeMessage[] receivedMessages = smtpServer.getReceivedMessages();
 		assertEquals(1, receivedMessages.length);
 		String content = (String) receivedMessages[0].getContent();
