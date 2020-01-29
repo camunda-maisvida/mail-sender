@@ -3,7 +3,7 @@ spring:
     name: mail-sender
   cloud:
     config:
-      uri: https://maisvida-configuration-server.cfapps.io/
+      uri: https://maisvida-configuration-server.herokuapp.com/
       password: ${config.server.password}
       username: ${config.server.user}
   profiles:
